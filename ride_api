@@ -1,0 +1,81 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMXo2F4X329PICngQpjS7HA",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sarvepallireshmitha526-lab/api-project-1/blob/main/ride_api\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 8,
+      "metadata": {
+        "id": "rTmkV0GX6dXu"
+      },
+      "outputs": [],
+      "source": [
+        "from fastapi import FastAPI\n",
+        "from pydantic import BaseModel\n",
+        "import uuid\n",
+        "app = FastAPI()\n",
+        "class RideRequest(BaseModel):\n",
+        "      passenger_name : str\n",
+        "      pickup_location : str\n",
+        "      drop_location : str\n",
+        "class RideResponse(BaseModel):\n",
+        "      ride_id : str\n",
+        "      eta : str\n",
+        "      status : str\n",
+        "rides = {}\n",
+        "@app.post(\"/rides\", response_model=RideResponse)\n",
+        "def book_ride(request: RideRequest):\n",
+        "    ride_id = str(uuid.uuid4())\n",
+        "    rides[ride_id] = {\n",
+        "        \"status\":\"Driver Assigned\",\n",
+        "        \"eta\": \"15 minutes\"\n",
+        "        }\n",
+        "    return {\n",
+        "        \"ride_id\":ride_id,\n",
+        "        \"eta\": \"15 minutes\",\n",
+        "        \"status\": \"Driver Assigned\"\n",
+        "        }\n",
+        "@app.get(\"/status/{ride_id}\",response_model = RideResponse)\n",
+        "def check_status(ride_id : str):\n",
+        "\n",
+        "   if ride_id not in rides:\n",
+        "      return {\n",
+        "          \"ride_id\": ride_id,\n",
+        "          \"eta\": rides[ride_id][\"eta\"],\n",
+        "          \"status\": rides[ride_id][\"status\"]\n",
+        "      }\n",
+        "   return {\n",
+        "       \"ride_id\":ride_id,\n",
+        "       \"eta\":\"N/A\",\n",
+        "       \"status\":\"RideNotFound\"\n",
+        "     }\n",
+        "\n",
+        "\n"
+      ]
+    }
+  ]
+}
